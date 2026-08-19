@@ -1,0 +1,125 @@
+1
+Descripción de la solución
+Tomas Castaño Taborda
+Se supone para la programación de rutas:
+1. una flota de 10 buses (personas) y 10 camiones (carga).
+2. La empresa opera las 24 horas del día.
+3. No se hará ningún sistema con los camiones de carga, el programa contará
+únicamente con los buses porque el problema solo los abarca a ellos.
+4. Cada bus tendrá una capacidad de pasajeros definida mediante una cantidad
+entera de asientos. Para efectos del sistema, se establece que la capacidad
+permitida estará entre 10 y 80 asientos, sin contar el asiento del conductor.
+Como valor inicial o por defecto, se podrá establecer una capacidad entre 14 y
+24 asientos.
+El programador de rutas podrá definir la cantidad exacta de asientos
+disponibles para cada bus, siempre que esta se encuentre dentro de los límites
+establecidos.
+2
+5. El programador de rutas ordenará cuando un bus debe iniciar su ruta (para
+menos complejidad, inmediatamente el bus completará su ruta)
+6. Cada bus tiene una ruta propia y única definida, al igual que sus horarios
+7. Cada ruta tiene su distancia definida en kilómetros, y es constante.
+9. Cuando un bus termine un viaje, sus puestos volverán a estar disponibles
+para una nueva programación. La capacidad original del bus se conservará.
+Por ejemplo, si un bus tiene 20 asientos y durante un viaje se venden 15
+tiquetes, al finalizar dicho viaje volverá a tener sus 20 puestos disponibles.
+Se supone para la gestión de tiquetes:
+1. Cada tiquete tiene asociado un viaje en específico, al realizar cada venta
+entonces de debe de seleccionar que bus tomará y en que horario (de los
+disponibles del bus), se muestra la ruta y el horario que se tomó además se
+debe seleccionar que tipo de tiquete será: viaje completo, viaje parcial,
+descuento especial. El tiquete almacenará el valor total a pagar por el pasajero.
+2. La cantidad total de puestos disponibles en el sistema será la suma de los
+puestos disponibles de los diferentes viajes programados.
+3
+Sin embargo, para realizar una venta no será suficiente con que exista
+disponibilidad general. El viaje específico seleccionado deberá tener al menos
+un puesto disponible.
+Por ejemplo, si un viaje no tiene puestos disponibles, no será posible vender
+un tiquete para ese viaje, aunque existan puestos disponibles en otros buses
+disponibles significa que todos los buses están llenos y no se puede vender un
+tiquete más.
+3. el valor por DEFECTO por km es de 1000$ (con el tipo de tiquete costo
+completo), además por cada km se tiene un gasto de 200$ de gasolina (se
+descuenta de las ganancias por trayecto).
+4. Se permite realizar a la venta de un solo tiquete o tal vez de varios tiquetes
+para un mismo bus y horario, siempre que exista la cantidad de asientos
+disponibles en el viaje asociado
+5. Cuando se cancele un tiquete el puesto volverá a estar disponible para la
+venta, se podrá cancelar 1 o más tiquetes sin exceder la cantidad de tiquetes
+vendidos en ese bus-viaje.
+4
+Proceso
+Abstracción:
+Clase Bus:
+tiene como atributos:
+1. idBus: identificador del bus de tipo char, se ordenarán únicamente de forma
+alfabética en el arreglo arrBuses con un orden establecido según capacidad
+máxima (de mayor a menor capacidad) ejemplo: (posición 0:"A”: capacidad
+80, posición 1 "B" : Capacidad 76, posición 2 : "C" : Capacidad 75.....) en
+caso de empate de capacidad, se conservará el orden alfabético del
+identificador.
+2. ruta: que será de la forma "A--B--C--D--E" con cada letra siendo el nombre
+de una ubicación, ejemplo: "Medellín--Bogotá" (cantidad de ubicaciones y
+trayectos queda a disposición de ser cualquiera)
+3. horaSalida: un arreglo LocalTime donde se guardan los 3 horarios de salida
+que todo bus tiene que tener, los horarios serán establecidos por defecto y sin
+inmodificables además de que será un estado de instancia de la clase Bus,
+ejemplo:
+horaSalida = {
+ LocalTime.of(6, 30),
+5
+ LocalTime.of(8, 0),
+ LocalTime.of(10, 15),
+};
+4. kmRuta: Valor de tipo real que representa la distancia total de la ruta (valor
+por defecto 150km).
+5. capacidadBus: Valor de tipo entero que representa la capacidad de asientos
+del bus.
+Clase Tiquete.
+Tiene como atributos:
+1. idTiquete: Un número de tipo entero que representa el identificador del
+tiquete.
+2. tipoTiquete: (completo, parcial, descuento) valor de tipo entero que
+sirve para distinguir entre los tipos de tiquetes (1 para completo, 2 para
+parcial, 3 para descuento).
+3. valorTiquete: Valor de tipo real que representa el costo del viaje para
+cada tiquete en específico.
+4. viajeAsignado: Relación con la clase Viaje.
+6
+Clase Viaje:
+Tiene como atributos:
+1. busAsignado: Valor Bus que representa el bus al cual el viaje pertenece.
+2. horarioViaje: Valor de tipo LocalTime que representa la hora en que
+inicia la ruta.
+3. asientosDisponibles: Valor de tipo entero, representa cuantos asientos
+disponibles hay para ese viaje.
+4. tiquetesViaje: ArrarayList como lista de objetos Tiquete.
+5. idViaje: Valor de tipo entero correspondiente al id del viaje en concreto.
+Métodos:
+
+arqueoViaje():
+Calcula los recaudos por cada tipo de tiquete, el gasto de combustible y la
+ganancia del viaje. Retorna el valor de la ganancia obtenida
+7
+-recaudoCompleto: cuanto se recaudó por tiquetes completos con la fórmula:
+(tiquetesCompletos * kmRuta * 1000).
+-recaudoParcial: cuanto se recaudó por tiquetes parciales, cada tiquete parcial
+calcula su propio costo entonces lo obtenido es el resultado de la suma de
+todos los costos de los tiquetes parciales del bus.
+-recaudoDescuento: cuanto se recaudó por tiquetes con descuento
+-gastoCombustible: gastos en combustible con la fórmula: (kmRuta * 200)
+-gananciaViaje: la suma de los recaudos – el gasto en combustible
+devolucionTiquete():
+Su función es poder devolver un/unos tiquetes en específico relacionados a un
+viaje, no retorna nada.
+-Recorre la lista tiquetesViaje de la clase Viaje en busca del tiquete que se
+quiere devolver, posteriormente se elimina del arreglo.
+1. kmRecorridos: Valor de tipo entero que representa los kilómetros
+recorridos, para facilitar el cálculo del coste del tiquete, para los tiquetes
+8
+completos y los tiquetes descuento se asigna los km de la ruta, siendo l
+relación: tiquete – viaje – bus – y acá se ve el km de la ruta.
+venderTiquetes(tiquete, cantidad):
+Su función es vender uno o más tiquetes, crea tiquetes (con todos sus datos) y
+los almacena en el arreglo tiquetesViaje
